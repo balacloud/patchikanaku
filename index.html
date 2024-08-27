@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ta">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>பஞ்ச பட்சி கணக்கீடு</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f0f8ff;
+            color: #333;
+            padding: 20px;
+            margin: 0;
+        }
+
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        h1 {
+            text-align: center;
+            color: #006400;
+        }
+
+        label {
+            display: block;
+            margin-top: 10px;
+        }
+
+        input, select, button {
+            width: 100%;
+            padding: 10px;
+            margin-top: 5px;
+            margin-bottom: 10px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+        }
+
+        button {
+            background-color: #4caf50;
+            color: white;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #results {
+            margin-top: 20px;
+            padding: 10px;
+            background-color: #e6f7ff;
+            border: 1px solid #b3d9ff;
+            border-radius: 4px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding: 10px;
+            }
+
+            .container {
+                padding: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>பஞ்ச பட்சி கணக்கீடு</h1>
+        <label for="start-time">தொடக்க நேரம்:</label>
+        <input type="time" id="start-time" name="start-time" step="1">
+        
+        <label for="end-time">முடிவு நேரம்:</label>
+        <input type="time" id="end-time" name="end-time" step="1">
+        
+        <label for="panchapakshi">பஞ்ச பட்சி:</label>
+        <select id="panchapakshi">
+            <option value="காகம்">காகம்</option>
+            <option value="வெள்ளி">வெள்ளி</option>
+            <option value="அனேக பறவை">அனேக பறவை</option>
+            <!-- Add other Panchapakshi options as needed -->
+        </select>
+        
+        <button onclick="calculate()">கணக்கீடு செய்யவும்</button>
+
+        <div id="results"></div>
+    </div>
+
+    <script>
+        function calculate() {
+            const startTime = document.getElementById('start-time').value;
+            const endTime = document.getElementById('end-time').value;
+            const panchapakshi = document.getElementById('panchapakshi').value;
+            
+            if (!startTime || !endTime) {
+                alert("தொடக்க மற்றும் முடிவு நேரத்தை உள்ளிடவும்.");
+                return;
+            }
+            
+            const results = calculateJamams(startTime, endTime, panchapakshi);
+            document.getElementById('results').innerHTML = results.join('<br>');
+        }
+
+        function calculateJamams(start, end, panchapakshi) {
+            const startDate = new Date(`1970-01-01T${start}Z`);
+            const endDate = new Date(`1970-01-01T${end}Z`);
+            const totalMinutes = (endDate - startDate) / 60000; // Convert milliseconds to minutes
+            
+            if (totalMinutes <= 0) {
+                alert("முடிவு நேரம் தொடக்க நேரத்திற்குப் பின் இருக்க வேண்டும்.");
+                return [];
+            }
+
+            const jamamDuration = totalMinutes / 5;
+            const results = [];
+            let currentStart = startDate;
+
+            for (let i = 0; i < 5; i++) {
+                const currentEnd = new Date(currentStart.getTime() + jamamDuration * 60000);
+                const formattedStart = formatTime12Hour(currentStart);
+                const formattedEnd = formatTime12Hour(currentEnd);
+                results.push(`ஜாமம் ${i+1}: ${formattedStart} - ${formattedEnd} (${panchapakshi})`);
+                currentStart = currentEnd;
+            }
+
+            return results;
+        }
+
+        function formatTime12Hour(date) {
+            let hours = date.getUTCHours();
+            let minutes = date.getUTCMinutes();
+            let seconds = date.getUTCSeconds();
+            const ampm = hours >= 12 ? 'PM' : 'AM';
+            hours = hours % 12;
+            hours = hours ? hours : 12; // the hour '0' should be '12'
+            minutes = minutes < 10 ? '0' + minutes : minutes;
+            seconds = seconds < 10 ? '0' + seconds : seconds;
+            const strTime = `${hours}:${minutes}:${seconds} ${ampm}`;
+            return strTime;
+        }
+    </script>
+</body>
+</html>
